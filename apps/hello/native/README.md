@@ -1,5 +1,11 @@
 # Hello Solana (Native)
 
+Complete all tasks below
+- Build
+- Test locally with LiteSVM
+- Deploy locally to `solana-test-validator` and test with Rust script
+- Deploy to Devnet and run the Rust script again
+
 # Build
 
 Generates `.so` file under `target/deploy`
@@ -45,6 +51,7 @@ cargo run --example demo $KEYPAIR $RPC $PROGRAM_ID
 solana config set -ud
 
 solana balance
+# Airdrop if wallet balance is low
 solana airdrop 1
 
 cargo build-sbf

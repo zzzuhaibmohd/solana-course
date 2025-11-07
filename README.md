@@ -17,6 +17,7 @@
     - Wallet
     - Exercises
         - native, anchor, exercise, solution
+            - README is exercise
 
 # Core concepts
 - Solana vs Ethereum
@@ -51,9 +52,8 @@
             - `.so`
     - Deploy
         - [Solana explorer](https://explorer.solana.com/)
-    - TODO: exercise
+    - Exercises
 - Anchor
-- TODO: deploy, run Solana script on Anchor programs?
 
 # Oracle
 - Native
