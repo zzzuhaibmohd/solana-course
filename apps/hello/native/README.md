@@ -34,12 +34,12 @@ Execute demo script
 ```shell
 PROGRAM_ID=your program ID
 RPC=https://api.devnet.solana.com
-KEYPAIR_PATH=path to key pair
+KEYPAIR=path to key pair
 
-cargo run --example demo $PROGRAM_ID $RPC $KEYPAIR_PATH
+cargo run --example demo $KEYPAIR $RPC $PROGRAM_ID
 ```
 
-# Deploy
+# Deploy to Devnet
 
 ```shell
 solana config set -ud
@@ -53,7 +53,9 @@ solana program deploy ./target/deploy/hello.so
 
 PROGRAM_ID=your program ID
 RPC=https://api.devnet.solana.com
-KEYPAIR_PATH=path to key pair
+KEYPAIR=path to key pair
 
-cargo run --example demo $PROGRAM_ID $RPC $KEYPAIR_PATH
+cargo run --example demo $KEYPAIR $RPC $PROGRAM_ID
 ```
+
+Check transaction signature at [Solana explorer](https://explorer.solana.com/?cluster=devnet)

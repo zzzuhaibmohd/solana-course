@@ -15,33 +15,38 @@ use std::str::FromStr;
 fn main() {
     let args: Vec<String> = std::env::args().collect();
 
-    println!("ARGS {:?}", args);
-
-    let program_id = Pubkey::from_str(&args[1]).expect("Invalid program ID");
+    let keypair_path: PathBuf = [&args[1]].iter().collect();
+    let payer = read_keypair_file(keypair_path).expect("Cannot read keypair file");
 
     // Connect to local cluster
     let rpc_url = String::from(&args[2]);
     let client = RpcClient::new_with_commitment(rpc_url, CommitmentConfig::confirmed());
 
-    let keypair_path: PathBuf = [&args[3]].iter().collect();
-    let payer = read_keypair_file(keypair_path).expect("Cannot read keypair file");
+    let program_id = Pubkey::from_str(&args[3]).expect("Invalid program ID");
+
+    println!("Wallet: {}", payer.pubkey());
+
+    // Wallet balance
+    let lamports = client.get_balance(&payer.pubkey()).unwrap();
+    let sol = lamports as f64 / solana_sdk::native_token::LAMPORTS_PER_SOL as f64;
+    println!("Balance: {} SOL ({} lamports)", sol, lamports);
 
     // Request airdrop of 1 SOL for transaction fees
-    /*
-    println!("Requesting airdrop...");
-    let airdrop_signature = client
-        .request_airdrop(&payer.pubkey(), 1_000_000_000)
-        .expect("Failed to request airdrop");
+    if sol < 1.0 {
+        println!("Requesting airdrop...");
+        let airdrop_signature = client
+            .request_airdrop(&payer.pubkey(), 1_000_000_000)
+            .expect("Failed to request airdrop");
 
-    // Wait for airdrop confirmation
-    while !client
-        .confirm_transaction(&airdrop_signature)
-        .unwrap_or(false)
-    {
-        std::thread::sleep(std::time::Duration::from_millis(500));
+        // Wait for airdrop confirmation
+        while !client
+            .confirm_transaction(&airdrop_signature)
+            .unwrap_or(false)
+        {
+            std::thread::sleep(std::time::Duration::from_millis(500));
+        }
+        println!("Airdrop confirmed");
     }
-    println!("Airdrop confirmed");
-    */
 
     // Create the instruction
     let ix = Instruction::new_with_borsh(
@@ -73,8 +78,8 @@ fn main() {
     if let Some(meta) = tx_info.transaction.meta {
         if let OptionSerializer::Some(logs) = meta.log_messages {
             println!("--- Transaction Logs ---");
-            for log in logs.iter() {
-                println!("{}", log);
+            for (i, log) in logs.iter().enumerate() {
+                println!("{i}: {}", log);
             }
         } else {
             println!("No logs");
