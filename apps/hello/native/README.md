@@ -1,6 +1,6 @@
 # Hello Solana (Native)
 
-Complete all tasks below
+Create an empty folder and complete all tasks below
 - Build
 - Test locally with LiteSVM
 - Deploy locally to `solana-test-validator` and test with Rust script

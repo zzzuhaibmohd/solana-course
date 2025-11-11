@@ -1,6 +1,6 @@
 # Hello Solana (Anchor)
 
-Complete all tasks below
+Create an empty folder and complete all tasks below
 - Build
 - Test locally
 - Deploy to Devnet
