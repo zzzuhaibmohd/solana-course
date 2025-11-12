@@ -1,5 +1,8 @@
 # Oracle (Native)
 
+This program will store the price of some asset in an account owned by this program.
+Only an authorized account will be able to update the price.
+
 Complete all tasks below
 - Implement an oracle program
 - Test locally with LiteSVM

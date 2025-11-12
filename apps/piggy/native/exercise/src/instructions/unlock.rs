@@ -22,44 +22,22 @@ pub fn unlock(
     let sys_program = next_account_info(account_iter)?;
 
     // Check that the given account key matches expected PDA
-    if *pda.key != get_pda(program_id, payer.key, dst.key, bump)? {
-        return Err(ProgramError::InvalidSeeds);
-    }
 
-    // Load and validate lock state
-    let (lock_dst, lock_exp) = {
-        let data = pda.data.borrow();
-        let lock = Lock::try_from_slice(&data)?;
-        (lock.dst, lock.exp)
-    }; // Drop borrow here
+    // Load lock state
 
     // Verify destination matches
-    if *dst.key != lock_dst {
-        return Err(ProgramError::InvalidAccountData);
-    }
 
     // Verify lock has expired
     let clock = Clock::get()?;
     let now: u64 = clock.unix_timestamp.try_into().unwrap();
-    if lock_exp >= now {
-        return Err(ProgramError::InvalidArgument);
-    }
 
     // Get PDA balance and transfer lamports directly
     // Rent + locked amount
     let pda_lamports = pda.lamports();
 
-    **pda.try_borrow_mut_lamports()? = 0;
-    **dst.try_borrow_mut_lamports()? = dst
-        .lamports()
-        .checked_add(pda_lamports)
-        .ok_or(ProgramError::ArithmeticOverflow)?;
-
     // Clear out data
-    pda.resize(0)?;
 
     // Assign the account to the System Program
-    pda.assign(sys_program.key);
 
     Ok(())
 }
