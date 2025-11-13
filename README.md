@@ -92,6 +92,7 @@
     - Manually send SOL
     - Account data must be empty when account has 0 SOL
 - [ ] [Anchor](./apps/piggy-bank/anchor)
+    - PDA bump, init and close
 
 # Dutch auction ? - Token
 - CLI
