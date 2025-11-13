@@ -6,7 +6,7 @@ resolution = true
 skip-lint = false
 
 [programs.localnet]
-piggy = "2LAxkM9uLztwKxvzeCKJhPV6WxF1S1mdYLToqQNxTCW9"
+piggy = "HaEoLt3pf1A7E7CrNYTooVPY8HJqUD2s4UTJX1JQ3kxC"
 
 [registry]
 url = "https://api.apr.dev"

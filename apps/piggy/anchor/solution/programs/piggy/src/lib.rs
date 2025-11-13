@@ -4,7 +4,7 @@ pub mod error;
 pub mod instructions;
 pub mod state;
 
-declare_id!("AZbizcSksZLiaKoFMB5hTJGtKUf6BxhyKVd2Ffdd41Ym");
+declare_id!("HaEoLt3pf1A7E7CrNYTooVPY8HJqUD2s4UTJX1JQ3kxC");
 
 #[program]
 pub mod piggy {
