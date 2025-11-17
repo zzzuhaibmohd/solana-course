@@ -14,4 +14,8 @@ pub enum Error {
     InvalidSellAmount,
     #[msg("Unauthorized")]
     Unauthorized,
+    #[msg("Auction ended")]
+    AuctionEnded,
+    #[msg("Invalid current price")]
+    InvalidCurrentPrice,
 }
