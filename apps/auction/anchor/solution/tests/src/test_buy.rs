@@ -66,6 +66,9 @@ fn test_buy() {
         })
         .send()
         .unwrap();
+    // Test auction has started
+    // Test auction has not ended
+    // Test max price
 
     // Buy
     let wait_time = start_time - now + 2;

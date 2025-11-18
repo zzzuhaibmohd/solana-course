@@ -22,6 +22,8 @@
     - Exercises
         - native, anchor, exercise, solution
             - README is exercise
+        - Debug
+            - `msg`
 
 # Core concepts
 - Solana vs Ethereum
