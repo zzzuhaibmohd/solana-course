@@ -66,9 +66,6 @@ fn test_buy() {
         })
         .send()
         .unwrap();
-    // Test auction has started
-    // Test auction has not ended
-    // Test max price
 
     // Buy
     let wait_time = start_time - now + 2;
@@ -104,7 +101,6 @@ fn test_buy() {
             .is_err(),
         "Auction not closed"
     );
-
     assert!(
         token_helper::get_balance(&token_program, &seller_buy_ata).unwrap() > 0,
         "Seller buy ATA balance"
