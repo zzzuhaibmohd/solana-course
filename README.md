@@ -101,13 +101,6 @@
 
 # Dutch auction
 - [ ] [SPL Token](./notes/spl.png)
-    - Mint
-        - https://solana.com/docs/tokens/basics/create-mint
-        - 1. Create mint account
-        - 2. Initialize Mint data
-    - Mint authority
-    - Token account
-    - Associated token account (ATA)
 - [ ] [Token CLI](./notes/token.md)
     - Create mint
         - Mint account state
