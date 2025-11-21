@@ -30,7 +30,7 @@ pub fn get_pda(
     )
 }
 
-fn create_ata<'a>(
+pub fn create_ata<'a>(
     payer: &AccountInfo<'a>,
     mint: &AccountInfo<'a>,
     owner: &AccountInfo<'a>,
@@ -65,12 +65,12 @@ fn create_ata<'a>(
     invoke(
         &ix,
         &[
-            payer.clone(),         // 0. Funding account
-            ata.clone(),           // 1. ATA to create
-            owner.clone(),         // 2. Wallet owner
-            mint.clone(),          // 3. Mint
-            sys_program.clone(),   // 4. System program
-            token_program.clone(), // 5. Token program
+            payer.clone(),         // Funding account
+            ata.clone(),           // ATA to create
+            owner.clone(),         // Wallet owner
+            mint.clone(),          // Mint
+            sys_program.clone(),   // System program
+            token_program.clone(), // Token program
             ata_program.clone(),
             rent_sysvar.clone(),
         ],

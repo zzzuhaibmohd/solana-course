@@ -6,7 +6,7 @@ use solana_program::{
     sysvar::{Sysvar, clock::Clock},
 };
 
-use super::lib::{get_ata, get_pda, transfer};
+use super::lib::{create_ata, get_ata, get_pda, transfer};
 use crate::state::Auction;
 
 pub fn init(
@@ -74,6 +74,18 @@ pub fn init(
     if sell_amt == 0 {
         return Err(ProgramError::InvalidArgument);
     }
+
+    // Create auction_sell_ata
+    create_ata(
+        payer,
+        mint_sell,
+        auction_pda,
+        auction_sell_ata,
+        token_program,
+        sys_program,
+        ata_program,
+        rent_sysvar,
+    )?;
 
     // Send sell token to auction_sell_ata
     transfer(&token_program, &payer, &auction_sell_ata, &payer, sell_amt)?;
