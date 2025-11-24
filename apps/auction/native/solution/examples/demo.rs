@@ -69,7 +69,9 @@ fn main() {
 
     let auction_sell_ata = get_ata(&auction_pda, &mint_sell);
 
-    // Create auction
+    // Init
+    println!("Init");
+
     let now = client.get_block_time(client.get_slot().unwrap()).unwrap() as u64;
     let start_price: u64 = (2.0 * 1e6) as u64;
     let end_price: u64 = (1.5 * 1e6) as u64;
@@ -77,73 +79,20 @@ fn main() {
     let end_time: u64 = start_time + 10;
     let sell_amt: u64 = 1e8 as u64;
 
-    let cmd = Cmd::Init {
+    let ix = create_init_ix(
+        program_id,
         start_price,
         end_price,
         start_time,
         end_time,
         sell_amt,
         bump,
-    };
-
-    let ix = Instruction::new_with_borsh(
-        program_id,
-        &cmd,
-        vec![
-            AccountMeta {
-                pubkey: seller.pubkey(),
-                is_signer: true,
-                is_writable: true,
-            },
-            AccountMeta {
-                pubkey: mint_sell,
-                is_signer: false,
-                is_writable: true,
-            },
-            AccountMeta {
-                pubkey: mint_buy,
-                is_signer: false,
-                is_writable: true,
-            },
-            AccountMeta {
-                pubkey: auction_pda,
-                is_signer: false,
-                is_writable: true,
-            },
-            AccountMeta {
-                pubkey: auction_sell_ata,
-                is_signer: false,
-                is_writable: true,
-            },
-            AccountMeta {
-                pubkey: seller_sell_ata,
-                is_signer: false,
-                is_writable: true,
-            },
-            AccountMeta {
-                pubkey: Pubkey::from(spl_token_interface::ID.to_bytes()),
-                is_signer: false,
-                is_writable: true,
-            },
-            AccountMeta {
-                pubkey: Pubkey::from(
-                    spl_associated_token_account_interface::program::ID
-                        .to_bytes(),
-                ),
-                is_signer: false,
-                is_writable: true,
-            },
-            AccountMeta {
-                pubkey: solana_sdk::system_program::id(),
-                is_signer: false,
-                is_writable: true,
-            },
-            AccountMeta {
-                pubkey: solana_sdk::sysvar::rent::id(),
-                is_signer: false,
-                is_writable: true,
-            },
-        ],
+        seller.pubkey(),
+        mint_sell,
+        mint_buy,
+        auction_pda,
+        auction_sell_ata,
+        seller_sell_ata,
     );
 
     let mut tx = Transaction::new_with_payer(&[ix], Some(&seller.pubkey()));
@@ -165,13 +114,13 @@ fn main() {
     println!("lock.exp: {:?}", lock.exp);
     println!("locked amt: {:?}", client.get_balance(&pda));
     */
-    assert_eq!(
-        get_token_balance(&client, &auction_sell_ata),
-        sell_amt,
-        "Auction sell ATA balance"
-    );
+    let auction_sell_bal = get_token_balance(&client, &auction_sell_ata);
+    println!("Auction sell ATA balance: {:?}", auction_sell_bal);
+
+    assert_eq!(auction_sell_bal, sell_amt, "Auction sell ATA balance");
 
     // Buy
+    println!("Buy");
     thread::sleep(std::time::Duration::from_millis(1500));
 
     let cmd = Cmd::Buy {
@@ -247,6 +196,205 @@ fn main() {
 
     let res = client.send_and_confirm_transaction(&tx);
     res.unwrap();
+
+    let buyer_buy_ata_bal = get_token_balance(&client, &buyer_buy_ata);
+    let buyer_sell_ata_bal = get_token_balance(&client, &buyer_sell_ata);
+    println!("Buyer buy ATA balance: {:?}", buyer_buy_ata_bal);
+    println!("Buyer sell ATA balance: {:?}", buyer_sell_ata_bal);
+
+    let seller_buy_ata_bal = get_token_balance(&client, &seller_buy_ata);
+    let seller_sell_ata_bal = get_token_balance(&client, &seller_sell_ata);
+    println!("Seller buy ATA balance: {:?}", seller_buy_ata_bal);
+    println!("Seller sell ATA balance: {:?}", seller_sell_ata_bal);
+
+    assert_eq!(buyer_sell_ata_bal, sell_amt, "Buyer sell ATA balance");
+    assert!(seller_buy_ata_bal > 0, "Seller buy ATA balance");
+
+    // Create auction
+    println!("Init");
+    let now = client.get_block_time(client.get_slot().unwrap()).unwrap() as u64;
+    let start_price: u64 = (2.0 * 1e6) as u64;
+    let end_price: u64 = (1.5 * 1e6) as u64;
+    let start_time: u64 = now + 1;
+    let end_time: u64 = start_time + 10;
+    let sell_amt: u64 = 1e8 as u64;
+
+    let ix = create_init_ix(
+        program_id,
+        start_price,
+        end_price,
+        start_time,
+        end_time,
+        sell_amt,
+        bump,
+        seller.pubkey(),
+        mint_sell,
+        mint_buy,
+        auction_pda,
+        auction_sell_ata,
+        seller_sell_ata,
+    );
+
+    let mut tx = Transaction::new_with_payer(&[ix], Some(&seller.pubkey()));
+    let blockhash = client.get_latest_blockhash().unwrap();
+    tx.sign(&[&seller], blockhash);
+
+    let res = client.send_and_confirm_transaction(&tx);
+    res.unwrap();
+
+    // Cancel
+    println!("Cancel");
+    let cmd = Cmd::Cancel { bump };
+
+    let ix = Instruction::new_with_borsh(
+        program_id,
+        &cmd,
+        vec![
+            AccountMeta {
+                pubkey: seller.pubkey(),
+                is_signer: true,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: mint_sell,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: mint_buy,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: auction_pda,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: auction_sell_ata,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: seller_sell_ata,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: Pubkey::from(spl_token_interface::ID.to_bytes()),
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: solana_sdk::system_program::id(),
+                is_signer: false,
+                is_writable: true,
+            },
+        ],
+    );
+
+    let seller_sell_ata_bal_before =
+        get_token_balance(&client, &seller_sell_ata);
+
+    let mut tx = Transaction::new_with_payer(&[ix], Some(&seller.pubkey()));
+    let blockhash = client.get_latest_blockhash().unwrap();
+    tx.sign(&[&seller], blockhash);
+
+    let res = client.send_and_confirm_transaction(&tx);
+    res.unwrap();
+
+    let seller_sell_ata_bal = get_token_balance(&client, &seller_sell_ata);
+    println!("Seller sell ATA balance: {:?}", seller_sell_ata_bal);
+    assert_eq!(
+        seller_sell_ata_bal,
+        seller_sell_ata_bal_before + sell_amt,
+        "Seller sell ATA balance"
+    );
+}
+
+fn create_init_ix(
+    program_id: Pubkey,
+    start_price: u64,
+    end_price: u64,
+    start_time: u64,
+    end_time: u64,
+    sell_amt: u64,
+    bump: u8,
+    seller: Pubkey,
+    mint_sell: Pubkey,
+    mint_buy: Pubkey,
+    auction_pda: Pubkey,
+    auction_sell_ata: Pubkey,
+    seller_sell_ata: Pubkey,
+) -> Instruction {
+    let cmd = Cmd::Init {
+        start_price,
+        end_price,
+        start_time,
+        end_time,
+        sell_amt,
+        bump,
+    };
+
+    Instruction::new_with_borsh(
+        program_id,
+        &cmd,
+        vec![
+            AccountMeta {
+                pubkey: seller,
+                is_signer: true,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: mint_sell,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: mint_buy,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: auction_pda,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: auction_sell_ata,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: seller_sell_ata,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: Pubkey::from(spl_token_interface::ID.to_bytes()),
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: Pubkey::from(
+                    spl_associated_token_account_interface::program::ID
+                        .to_bytes(),
+                ),
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: solana_sdk::system_program::id(),
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: solana_sdk::sysvar::rent::id(),
+                is_signer: false,
+                is_writable: true,
+            },
+        ],
+    )
 }
 
 fn airdrop(client: &RpcClient, pubkey: &Pubkey, lamports: u64) {

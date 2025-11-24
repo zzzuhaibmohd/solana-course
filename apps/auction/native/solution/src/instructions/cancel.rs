@@ -1,9 +1,7 @@
-use borsh::BorshDeserialize;
 use solana_program::{
     account_info::{AccountInfo, next_account_info},
     program_error::ProgramError,
     pubkey::Pubkey,
-    sysvar::{Sysvar, clock::Clock},
 };
 
 use super::lib::{
@@ -62,7 +60,7 @@ pub fn cancel(
     transfer_from_pda(
         token_program,
         auction_sell_ata,
-        seller,
+        seller_sell_ata,
         auction_pda,
         sell_amt,
         seeds,
