@@ -1,17 +1,12 @@
 use borsh::{BorshDeserialize, BorshSerialize};
 use solana_program::{
-    account_info::{AccountInfo, next_account_info},
-    entrypoint,
-    entrypoint::ProgramResult,
-    msg,
-    program_error::ProgramError,
+    account_info::AccountInfo, entrypoint, entrypoint::ProgramResult,
     pubkey::Pubkey,
 };
 
 pub mod constants;
 pub mod instructions;
 pub mod state;
-use state::Pool;
 
 #[derive(BorshDeserialize, BorshSerialize)]
 pub enum Cmd {
@@ -57,7 +52,7 @@ pub fn process_instruction(
         Cmd::Init {
             fee,
             pool_bump,
-            mint_pool_bump, // Added
+            mint_pool_bump,
         } => {
             instructions::init(
                 program_id,
