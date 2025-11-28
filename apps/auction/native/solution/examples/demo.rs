@@ -100,18 +100,6 @@ fn main() {
     let res = client.send_and_confirm_transaction(&tx);
     res.unwrap();
 
-    // TODO: check state
-    /*
-    let data = client
-        .get_account_data(&pda)
-        .expect("Failed to fetch account data");
-
-    let lock = Lock::try_from_slice(&data).expect("Failed to deserialize");
-
-    println!("lock.dst: {:?}", lock.dst);
-    println!("lock.exp: {:?}", lock.exp);
-    println!("locked amt: {:?}", client.get_balance(&pda));
-    */
     let auction_sell_bal = get_token_balance(&client, &auction_sell_ata);
     println!("Auction sell ATA balance: {:?}", auction_sell_bal);
 
