@@ -123,6 +123,7 @@
     - `Anchor.toml`
     - tests/Cargo.toml (`no-entrypoint`)
 - [ ] [Native](./apps/cpi/native)
+    - No auto generated IDL
 
 # Wormhole
 
