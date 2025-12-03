@@ -28,7 +28,7 @@
 
 # Core concepts
 - [Solana vs Ethereum](./notes/eth-sol.png)
-- Accounts
+- [Accounts](./notes/account.png)
     - data
     - lamports
     - owner
