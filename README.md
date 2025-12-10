@@ -124,10 +124,19 @@
     - No auto generated IDL
 
 # Wormhole
-- [Overview](https://wormhole.com/docs/products/messaging/overview/)
-    - Guardian network, consensus model
-    - VAA and message relaying
+- [Overview](./notes/wormhole.png)
+    - [Overview](https://wormhole.com/docs/products/messaging/overview/)
+    - Wormhole is a cross-chain messaging and bridging protocol
+    - [Guardians](https://wormhole.com/docs/protocol/infrastructure/guardians/)
+        - nodes that validate messages (events) emitted to Wormhole's core contracts
+        - Consensus -> 19 nodes (2/3 majority) 13 nodes must approve
+            - [Verifiable Action Approvals (VAA)](https://wormhole.com/docs/protocol/infrastructure/vaas/)
+            - VAA submitted to destination chain
+        - [Dashboard](https://wormhole-foundation.github.io/wormhole-dashboard/#/?endpoint=Mainnet)
+    - Executor
+        - ets anyone act as a relayer to take a Wormhole message (a VAA) from one chain and execute it on another
     - [NTT](https://wormhole.com/docs/products/token-transfers/overview/)
+        - Burn & mint, hub and spokes
 - NTT
     - Overview (SPL to ETH ERC20)
     - CLI setup (NTT 1.6.0)
