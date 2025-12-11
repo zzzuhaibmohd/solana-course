@@ -89,8 +89,6 @@ fn main() {
     // Init pool
     println!("--- Init pool ---");
 
-    let fee: u16 = 500;
-
     let ix = create_init_pool_ix(
         program_id,
         payer.pubkey(),
@@ -146,7 +144,7 @@ fn main() {
     println!("Pool A: {:?}", get_token_balance(&client, &pool_a));
     println!("Pool B: {:?}", get_token_balance(&client, &pool_b));
 
-    // SwaV
+    // Swap
     println!("--- Swap ---");
 
     let a_for_b = true;
