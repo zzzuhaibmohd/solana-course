@@ -219,6 +219,18 @@
     - Deploy Solana AMM (NTT token + token)
         - [NTT token](https://explorer.solana.com/address/73Rgt8CZCJez89VtJdRd84kfUPVSprS2Sy5V7Skmq1bU?cluster=devnet)
         - [SPL token](https://explorer.solana.com/address/GK4c9bYHnKEDeKMXfve9xWFQ7byjjaWWdGNrzBW2Geep?cluster=devnet)
+        - [CSAMM](https://explorer.solana.com/address/9Xsm3WVTBY6ALbUhRTDzt5wVZiNN52BU5kXUR3m6ERZ?cluster=devnet)
+            - Deploy (switch Solana CLI to latest)
+            ```
+            sh -c "$(curl -sSfL https://release.anza.xyz/stable/install)"
+
+            solana config set -ud
+            solana program deploy ./target/deploy/amm.so
+            ```
+            - Transfer NTT token from EVM
+            - Execute AMM script
+                - init pool, add liquidity, swap
+
 
 # Resources
 
