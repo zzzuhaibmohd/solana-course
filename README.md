@@ -31,19 +31,7 @@ TODO: clean up
 # Core concepts
 - [ ] [Solana vs Ethereum](./notes/eth-sol.png)
 - [ ] [Accounts](./notes/account.png)
-    - data
-    - lamports
-    - owner
-    - Keypair must prove existence of keypair before sending transaction to create account, receive SOL, etc
-    - Rent
-        - Data must be empty if SOL = 0
 - [ ] [Programs, instructions and transactions](./notes/program.png)
-    - [ ] program id
-        - how is it derived?
-            - Randomly generated private key typically stored under  `target/deploy/my_program.json`
-            - Private key needed for upgrade
-        - Pub key needed for user interaction
-    - [ ] [Limitations](https://solana.com/docs/programs/limitations)
 - [ ] [PDA](./notes/pda.png)
 - [ ] [CPI](https://solana.com/docs/core/cpi)
     - permissions
@@ -62,7 +50,13 @@ TODO: clean up
             - `solana-test-calidator`
             - `.so`
     - Deploy
+        - [ ] program id
+            - how is it derived?
+                - Randomly generated private key typically stored under  `target/deploy/my_program.json`
+                - Private key needed for upgrade
+            - Pub key needed for user interaction
         - [Solana explorer](https://explorer.solana.com/)
+        - [ ] [Limitations](https://solana.com/docs/programs/limitations)
     - Exercises
 - [ ] [Anchor](./apps/hello/anchor)
     - `anchor init hello --test-template rust`
