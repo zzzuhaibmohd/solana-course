@@ -24,6 +24,7 @@ TODO: clean up
     - Exercises
         - native, anchor, exercise, solution
             - README is exercise
+        - native -> anchor or anchor -> native
         - Debug
             - `msg`
         - Anchor tests in Rust are unreliable
@@ -37,58 +38,42 @@ TODO: clean up
 - [x] [IDL](https://solana.com/developers/guides/advanced/idls)
 
 # Hello
-- [ ] [Native](./apps/hello/native)
-    - Borsh
-    - `entrypoint`
-    - `msg`
-    - Build, test, deploy
-    - `cargo build-sbf`
-    - Test
-        - Script
-            - `solana-test-calidator`
-            - `.so`
-    - Deploy
-        - [ ] program id
-            - how is it derived?
-                - Randomly generated private key typically stored under  `target/deploy/my_program.json`
-                - Private key needed for upgrade
+- [Native](./apps/hello/native)
+    - [ ] `entrypoint`
+    - [ ] How is the program id derived?
+        - Randomly generated private key typically stored under  `target/deploy/my_program.json`
+            - Private key needed for upgrade
             - Pub key needed for user interaction
-        - [Solana explorer](https://explorer.solana.com/)
-        - [ ] [Limitations](https://solana.com/docs/programs/limitations)
-    - Exercises
-- [ ] [Anchor](./apps/hello/anchor)
-    - `anchor init hello --test-template rust`
-    - https://www.anchor-lang.com/docs/basics/program-structure
+    - [ ] [Limitations](https://solana.com/docs/programs/limitations)
+- [Anchor](./apps/hello/anchor)
+    - [ ] https://www.anchor-lang.com/docs/basics/program-structure
         - `declare_id` -> Anchor.toml
         - `#program`
         - `Accounts`
+        - `anchor keys sync`
 
 # Oracle
 - [ ] [Native](./apps/oracle/native)
-    - State - Borsh
-    - Program owns oracle account
-    - Program owns oracle account
-    - Oracle data space
-    - Order of account is important
-    - `owner` must sign
+    - [ ] State
+        - Program owns oracle account
+        - Oracle data space
+        - Order of account is important
+        - `owner` must sign
 - [ ] [Anchor](./apps/oracle/anchor)
-    - `anchor keys sync`
-    - `InitSpace`
     - `Signer`
     - `mut`
     - `init`
+        - `InitSpace`
+        - Discriminator
     - `constraint`
-    - Discriminator
 
 # Piggy bank - PDA
-- [ ] [Native](./apps/piggy-bank/native)
-    - CPI - invoke
-    - Calculate PDA before PDA is initialized
-    - Create PDA
-    - Transfer SOL
-    - Manually send SOL
-    - Account data must be empty when account has 0 SOL
-- [ ] [Anchor](./apps/piggy-bank/anchor)
+- [Native](./apps/piggy-bank/native)
+    - [ ] Unlock
+        - Transfer SOL
+        - Manually send SOL
+        - Account data must be empty when account has 0 SOL
+- [Anchor](./apps/piggy-bank/anchor)
     - PDA bump, init and close
 
 # Dutch auction
@@ -103,18 +88,17 @@ TODO: clean up
 - [ ] [Native](./apps/auction/native)
 
 # AMM
-- [ ] [Anchor](./apps/amm/anchor)
-- [ ] [Native](./apps/amm/native)
+- [ ] [Constant sum AMM](https://www.desmos.com/calculator/4ro4f7iwlz)
+- [Anchor](./apps/amm/anchor)
+- [Native](./apps/amm/native)
 
 # CPI and IDL
-- [ ] [Anchor](./apps/cpi/anchor)
+- [Anchor](./apps/cpi/anchor)
+    - [ ] IDL
     - compile counter
-    - `Factory counter; Signer<info>`
-    // In project root, copy IDL files to idls
-    //  cp target/idl/*.json ./idls/
-    - `Anchor.toml`
-    - tests/Cargo.toml (`no-entrypoint`)
-- [ ] [Native](./apps/cpi/native)
+        // In project root, copy IDL files to idls
+        //  cp target/idl/*.json ./idls/
+- [Native](./apps/cpi/native)
     - No auto generated IDL
 
 # Wormhole
