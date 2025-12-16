@@ -49,13 +49,12 @@ TODO: clean up
 - [ ] [Anchor](./apps/oracle/anchor)
 
 # Piggy bank - PDA
-- [Native](./apps/piggy-bank/native)
+- [Native](./apps/piggy/native)
     - [ ] Unlock
         - Transfer SOL
         - Manually send SOL
         - Account data must be empty when account has 0 SOL
-- [Anchor](./apps/piggy-bank/anchor)
-    - PDA bump, init and close
+- [Anchor](./apps/piggy/anchor)
 
 # Dutch auction
 - [ ] [SPL Token](./notes/spl.png)
