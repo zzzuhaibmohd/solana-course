@@ -50,10 +50,7 @@ TODO: clean up
 
 # Piggy bank - PDA
 - [Native](./apps/piggy/native)
-    - [ ] Unlock
-        - Transfer SOL
-        - Manually send SOL
-        - Account data must be empty when account has 0 SOL
+    - [ ] [Manually transfer of SOL](./notes/transfer-sol.png)
 - [Anchor](./apps/piggy/anchor)
 
 # Dutch auction
