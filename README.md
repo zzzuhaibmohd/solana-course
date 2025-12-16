@@ -39,11 +39,7 @@ TODO: clean up
 
 # Hello
 - [Native](./apps/hello/native)
-    - [ ] `entrypoint`
-    - [ ] How is the program id derived?
-        - Randomly generated private key typically stored under  `target/deploy/my_program.json`
-            - Private key needed for upgrade
-            - Pub key needed for user interaction
+    - [ ] [How is the program id derived?](./notes/program-id.md)
     - [ ] [Limitations](https://solana.com/docs/programs/limitations)
 - [Anchor](./apps/hello/anchor)
     - [ ] https://www.anchor-lang.com/docs/basics/program-structure
@@ -209,7 +205,6 @@ TODO: clean up
         - Add liquidity
             - Mint ERC20 and NTT token
             - ERC20 and NTT token approve CSAMM and add liquidity
-
 
 # Resources
 
