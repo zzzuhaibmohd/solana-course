@@ -29,14 +29,6 @@ Please refer to this for an in-depth explanation of the content:
 - Anchor 0.31
 
 - [ ] [Course intro](./notes/course_intro.md)
-    - Prerequisites
-        - Rust
-        - Blockchain
-    - Learn
-        - AI (starter -> fix code)
-            - Anchor -> Native
-            - test
-        - crates.rs -> docs.rs
 - [ ] [Setup](./notes/install.md)
     - Install
     - CLI basics
