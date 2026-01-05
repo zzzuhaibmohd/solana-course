@@ -7,13 +7,13 @@ Create an empty folder and complete all tasks below
 
 # Build
 
-Initialize a new Anchor project in an empty holder
+Initialize a new Anchor project in an empty folder
 ```shell
 anchor init hello --test-template rust
 ```
 
 Optionally update program id
-``shell
+```shell
 anchor keys sync
 ```
 
@@ -27,7 +27,7 @@ anchor build
 anchor test
 ```
 
-Sometimes test fails for no appearant reason. Usually resetting Anchor fixes the issue.
+Sometimes test fails for no apparent reason. Usually resetting Anchor fixes the issue.
 
 ```shell
 anchor clean

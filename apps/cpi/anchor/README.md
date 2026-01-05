@@ -73,7 +73,7 @@ let cpi_ctx = CpiContext::new(
 counter::cpi::inc(cpi_ctx)?;
 ```
 - Add `counter_program` into `Inc`
-```rustl
+```rust
 pub counter_program: Program<'info, Counter>,
 ```
 

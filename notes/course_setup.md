@@ -31,7 +31,7 @@ solana-keygen new
 # Check wallet address
 solana address
 
-# Airdop SOL (Devnet)
+# Airdrop SOL (Devnet)
 solana config set -ud
 solana airdrop 2
 

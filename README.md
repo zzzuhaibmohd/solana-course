@@ -65,6 +65,9 @@ Please refer to this for an in-depth explanation of the content:
 - [Anchor](./apps/cpi/anchor)
 - [Native](./apps/cpi/native)
 
+# Common Bugs
+- [Missing signer](./apps/ctf/signer)
+
 # Resources
 
 - [Solana docs](https://solana.com/docs)

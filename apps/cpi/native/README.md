@@ -91,7 +91,7 @@ solana program deploy ./target/deploy/factory.so
 
 Execute [demo script](https://github.com/Cyfrin/solana-course/tree/main/apps/cpi/native/exercise/examples)
 ```shell
-FACOTRY_PROGRAM_ID=your factory program ID
+FACTORY_PROGRAM_ID=your factory program ID
 COUNTER_PROGRAM_ID=your counter program ID
 RPC=http://localhost:8899
 KEYPAIR=path to key pair

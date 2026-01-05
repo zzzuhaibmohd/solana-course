@@ -2,7 +2,7 @@
 
 This program will create a PDA to store SOL.
 SOL is kept in this PDA until expiry.
-After expiry, SOL can be sent to a destinated account.
+After expiry, SOL can be sent to a designated account.
 
 Complete all tasks below
 - Implement the piggy bank program
@@ -53,7 +53,7 @@ let mut data = pda.data.borrow_mut();
 let lock = Lock { dst, exp };
 lock.serialize(&mut &mut data[..])?;
 ```
-- Call `instuctions::lock` inside `lib.rs`
+- Call `instructions::lock` inside `lib.rs`
 
 
 # Task 2 - Implement [`instructions::unlock`](https://github.com/Cyfrin/solana-course/blob/main/apps/piggy/native/exercise/src/instructions/unlock.rs)
@@ -84,7 +84,7 @@ pda.resize(0)?;
 ```rust
 pda.assign(sys_program.key);
 ```
-- Call `instuctions::unlock` inside `lib.rs`
+- Call `instructions::unlock` inside `lib.rs`
 
 # Build
 
