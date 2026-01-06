@@ -69,7 +69,7 @@ Please refer to this for an in-depth explanation of the content:
 - [Missing signer check](./apps/ctf/signer)
 - [Missing authorization check](./apps/ctf/auth)
 - [Missing PDA check](./apps/ctf/pda)
-- [Missing rent cleanup](./apps/ctf/pda)
+- [Missing rent cleanup](./apps/ctf/rent)
 
 # Resources
 

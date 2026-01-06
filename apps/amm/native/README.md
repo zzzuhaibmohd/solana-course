@@ -24,7 +24,7 @@ See [`instructions/lib.rs`](https://github.com/Cyfrin/solana-course/blob/main/ap
 - Initialize `mint_pool`
 - Initialize `Pool` state
 
-# Task 2 - Implement [`instructions::add_liquidity`](https://github.com/Cyfrin/solana-course/blob/main/apps/amm/native/exercise/src/instructions/init.rs)
+# Task 2 - Implement [`instructions::add_liquidity`](https://github.com/Cyfrin/solana-course/blob/main/apps/amm/native/exercise/src/instructions/add_liquidity.rs)
 
 - Verify `payer` is signer
 - Verify provided `pool` PDA matches the one calculated by `lib::get_pool_pda`
@@ -40,7 +40,7 @@ See [`instructions/lib.rs`](https://github.com/Cyfrin/solana-course/blob/main/ap
 - Transfer `mint_b` from payer to `pool_b`
 - Mint LP tokens to `payer`
 
-# Task 3 - Implement [`instructions::remove_liquidity`](https://github.com/Cyfrin/solana-course/blob/main/apps/amm/native/exercise/src/instructions/init.rs)
+# Task 3 - Implement [`instructions::remove_liquidity`](https://github.com/Cyfrin/solana-course/blob/main/apps/amm/native/exercise/src/instructions/remove_liquidity.rs)
 
 - Verify `payer` is signer
 - Verify provided `pool` PDA matches the one calculated by `lib::get_pool_pda`
@@ -56,7 +56,7 @@ See [`instructions/lib.rs`](https://github.com/Cyfrin/solana-course/blob/main/ap
 - Transfer token A from pool to `payer`
 - Transfer token B from pool to `payer`
 
-# Task 3 - Implement [`instructions::swap`](https://github.com/Cyfrin/solana-course/blob/main/apps/amm/native/exercise/src/instructions/init.rs)
+# Task 4 - Implement [`instructions::swap`](https://github.com/Cyfrin/solana-course/blob/main/apps/amm/native/exercise/src/instructions/swap.rs)
 
 - Verify `payer` is signer
 - Verify provided `pool` PDA matches the one calculated by `lib::get_pool_pda`
@@ -90,7 +90,7 @@ solana-test-validator
 
 Deploy program
 ```shell
-solana program deploy ./target/deploy/auction.so
+solana program deploy ./target/deploy/amm.so
 ```
 
 Execute demo script

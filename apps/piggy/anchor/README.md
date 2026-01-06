@@ -1,7 +1,7 @@
 # Piggy Bank (Anchor)
 
 Complete all tasks below
-- Implement an oracle program
+- Implement a piggy bank program
 - Test locally
 
 # Update program id
