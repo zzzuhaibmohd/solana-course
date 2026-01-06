@@ -13,7 +13,7 @@ Generates `.so` file under `target/deploy`
 cargo build-sbf
 ```
 
-# Test with LiteSVM
+# Test
 ```shell
 cargo test -- --nocapture
 ```

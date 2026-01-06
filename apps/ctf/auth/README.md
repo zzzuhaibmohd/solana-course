@@ -14,7 +14,7 @@ Write your exploit inside [`test`](https://github.com/Cyfrin/solana-course/blob/
 cargo build-sbf
 ```
 
-# Test with LiteSVM
+# Test
 Your exploit is successful if the test passes.
 
 ```shell

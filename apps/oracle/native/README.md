@@ -26,7 +26,7 @@ Complete all tasks below
 cargo build-sbf
 ```
 
-# Test with LiteSVM
+# Test
 ```shell
 cargo test -- --nocapture
 ```

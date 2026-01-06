@@ -92,7 +92,7 @@ pda.assign(sys_program.key);
 cargo build-sbf
 ```
 
-# Test with LiteSVM
+# Test
 ```shell
 cargo test -- --nocapture
 ```

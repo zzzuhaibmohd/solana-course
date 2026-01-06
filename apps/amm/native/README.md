@@ -75,7 +75,7 @@ See [`instructions/lib.rs`](https://github.com/Cyfrin/solana-course/blob/main/ap
 cargo build-sbf
 ```
 
-# Test with LiteSVM
+# Test
 ```shell
 cargo test -- --nocapture
 ```
