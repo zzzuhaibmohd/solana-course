@@ -12,12 +12,12 @@ pub mod piggy {
     use super::*;
 
     pub fn lock(ctx: Context<Lock>, amt: u64, exp: u64) -> Result<()> {
-        // Write your code here
+        instructions::lock(ctx, amt, exp)?;
         Ok(())
     }
 
     pub fn unlock(ctx: Context<Unlock>) -> Result<()> {
-        // Write your code here
+        instructions::unlock(ctx)?;
         Ok(())
     }
 }

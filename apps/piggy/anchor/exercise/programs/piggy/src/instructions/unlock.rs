@@ -30,8 +30,25 @@ pub fn unlock(ctx: Context<Unlock>) -> Result<()> {
     let clock = Clock::get()?;
 
     // Check expiration
+    let current_time: u64 = clock.unix_timestamp.try_into().unwrap();
+    require!(
+        current_time >= ctx.accounts.lock.exp,
+        error::Error::LockNotExpired
+    );
 
     // Transfer all lamports to dst
+    let amt = ctx.accounts.lock.to_account_info().lamports();
+    //@note -> The program is the owner hance we can directly manipulate the lamports
+    **ctx
+        .accounts
+        .lock
+        .to_account_info()
+        .try_borrow_mut_lamports()? -= amt;
+    **ctx
+        .accounts
+        .dst
+        .to_account_info()
+        .try_borrow_mut_lamports()? += amt;
 
     Ok(())
 }
