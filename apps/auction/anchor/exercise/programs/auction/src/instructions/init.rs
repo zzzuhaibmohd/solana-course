@@ -13,8 +13,8 @@ pub struct Init<'info> {
     #[account(mut)]
     pub payer: Signer<'info>,
 
-    pub mint_sell: InterfaceAccount<'info, Mint>,
-    pub mint_buy: InterfaceAccount<'info, Mint>,
+    pub mint_sell: InterfaceAccount<'info, Mint>, // the sell token Ex: USDC
+    pub mint_buy: InterfaceAccount<'info, Mint>,  // the buy token Ex: SOL
 
     #[account(
         init,
@@ -73,16 +73,38 @@ pub fn init(
     let now = u64::try_from(clock.unix_timestamp).unwrap();
 
     // Check sell token != buy token
+    require!(
+        ctx.accounts.mint_sell.key() != ctx.accounts.mint_buy.key(),
+        error::Error::InvalidMints
+    );
 
     // Check start_price >= end_price
+    require!(start_price >= end_price, error::Error::InvalidPrices);
 
     // Check now <= start_time < end_time
+    require!(now <= start_time, error::Error::InvalidStartTime);
+    require!(start_time < end_time, error::Error::InvalidEndTime);
 
     // Check sell_amt > 0
+    require!(sell_amt > 0, error::Error::InvalidSellAmount);
 
     // Send sell token to auction_sell_ata
+    lib::transfer(
+        &ctx.accounts.token_program,
+        &ctx.accounts.seller_sell_ata,
+        &ctx.accounts.auction_sell_ata,
+        &ctx.accounts.payer,
+        sell_amt,
+    )?;
 
     // Store Auction state
+    let auction = &mut ctx.accounts.auction;
+    auction.mint_sell = ctx.accounts.mint_sell.key();
+    auction.mint_buy = ctx.accounts.mint_buy.key();
+    auction.start_price = start_price;
+    auction.end_price = end_price;
+    auction.start_time = start_time;
+    auction.end_time = end_time;
 
     Ok(())
 }

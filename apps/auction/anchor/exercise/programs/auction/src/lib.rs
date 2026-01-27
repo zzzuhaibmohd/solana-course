@@ -19,17 +19,24 @@ pub mod auction {
         end_time: u64,
         sell_amt: u64,
     ) -> Result<()> {
-        // Write your code here
+        instructions::init(
+            ctx,
+            start_price,
+            end_price,
+            start_time,
+            end_time,
+            sell_amt,
+        )?;
         Ok(())
     }
 
     pub fn buy(ctx: Context<Buy>, max_price: u64) -> Result<()> {
-        // Write your code here
+        instructions::buy(ctx, max_price)?;
         Ok(())
     }
 
     pub fn cancel(ctx: Context<Cancel>) -> Result<()> {
-        // Write your code here
+        instructions::cancel(ctx)?;
         Ok(())
     }
 }

@@ -18,8 +18,8 @@ pub struct Buy<'info> {
     #[account(mut)]
     pub seller: UncheckedAccount<'info>,
 
-    pub mint_sell: InterfaceAccount<'info, Mint>,
-    pub mint_buy: InterfaceAccount<'info, Mint>,
+    pub mint_sell: Box<InterfaceAccount<'info, Mint>>,
+    pub mint_buy: Box<InterfaceAccount<'info, Mint>>,
 
     #[account(
         mut,
@@ -32,35 +32,35 @@ pub struct Buy<'info> {
         bump,
         close = seller,
     )]
-    pub auction: Account<'info, state::Auction>,
+    pub auction: Box<Account<'info, state::Auction>>,
 
     #[account(
         mut,
         associated_token::mint = mint_sell,
         associated_token::authority = auction,
     )]
-    pub auction_sell_ata: InterfaceAccount<'info, TokenAccount>,
+    pub auction_sell_ata: Box<InterfaceAccount<'info, TokenAccount>>,
 
     #[account(
         mut,
         associated_token::mint = mint_buy,
         associated_token::authority = buyer,
     )]
-    pub buyer_buy_ata: InterfaceAccount<'info, TokenAccount>,
+    pub buyer_buy_ata: Box<InterfaceAccount<'info, TokenAccount>>,
 
     #[account(
         mut,
         associated_token::mint = mint_sell,
         associated_token::authority = buyer,
     )]
-    pub buyer_sell_ata: InterfaceAccount<'info, TokenAccount>,
+    pub buyer_sell_ata: Box<InterfaceAccount<'info, TokenAccount>>,
 
     #[account(
         mut,
         associated_token::mint = mint_buy,
         associated_token::authority = seller,
     )]
-    pub seller_buy_ata: InterfaceAccount<'info, TokenAccount>,
+    pub seller_buy_ata: Box<InterfaceAccount<'info, TokenAccount>>,
 
     pub token_program: Interface<'info, TokenInterface>,
     pub associated_token_program: Program<'info, AssociatedToken>,
@@ -71,19 +71,46 @@ pub fn buy(ctx: Context<Buy>, max_price: u64) -> Result<()> {
     let clock = Clock::get()?;
     let now = u64::try_from(clock.unix_timestamp).unwrap();
 
+    let auction = &ctx.accounts.auction;
+
     // Check auction has started
+    require!(now >= auction.start_time, error::Error::AuctionNotStarted);
 
     // Check auction has not ended
+    require!(now < auction.end_time, error::Error::AuctionEnded);
 
-    // Calculate price
+    // Calculate current auction price using linear interpolation
+    // Price decreases linearly from start_price to end_price over the auction duration
+    // Example: start_price = 100, end_price = 10, start_time = 100, end_time = 200, now = 150
+    // price_decrease = (100 - 10) * (150 - 100) / (200 - 100) = 90 * 50 / 100 = 45
+    // price = 100 - 45 = 55
+    // @note -> PRICE = (DIFF of PRICE) * (TIME PASSED) / (AUCTION DURATION)
+    let price_decrease = (auction.start_price - auction.end_price)
+        * (now - auction.start_time)
+        / (auction.end_time - auction.start_time);
+    let price = auction.start_price - price_decrease;
 
     // Check current price is greater than or equal to end_price
+    require!(
+        price >= auction.end_price,
+        error::Error::InvalidCurrentPrice
+    );
 
     // Check current price is less than or equal to max_price
+    require!(price <= max_price, error::Error::MaxPrice);
 
     // Calculate amount of buy token to send to seller
+    let sell_amt = ctx.accounts.auction_sell_ata.amount;
+    let buy_amt = sell_amt * price / (1e6 as u64);
 
     // Send buy token to seller
+    lib::transfer(
+        &ctx.accounts.token_program,
+        &ctx.accounts.buyer_buy_ata,
+        &ctx.accounts.seller_buy_ata,
+        &ctx.accounts.buyer,
+        buy_amt,
+    )?;
 
     // Send sell token to buyer
     let seeds: &[&[u8]] = &[
@@ -94,7 +121,25 @@ pub fn buy(ctx: Context<Buy>, max_price: u64) -> Result<()> {
         &[ctx.bumps.auction],
     ];
 
+    lib::transfer_from_pda(
+        &ctx.accounts.token_program,
+        &ctx.accounts.auction_sell_ata,
+        &ctx.accounts.buyer_sell_ata,
+        &ctx.accounts.auction,
+        sell_amt,
+        seeds,
+    )?;
+
     // Close auction_sell_ata
+    close_account(CpiContext::new_with_signer(
+        ctx.accounts.token_program.to_account_info(),
+        CloseAccount {
+            account: ctx.accounts.auction_sell_ata.to_account_info(),
+            destination: ctx.accounts.seller.to_account_info(),
+            authority: ctx.accounts.auction.to_account_info(),
+        },
+        &[seeds],
+    ))?;
 
     Ok(())
 }
