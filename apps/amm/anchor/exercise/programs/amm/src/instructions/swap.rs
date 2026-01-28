@@ -26,38 +26,38 @@ pub struct Swap<'info> {
         has_one = mint_a,
         has_one = mint_b,
     )]
-    pub pool: Account<'info, Pool>,
+    pub pool: Box<Account<'info, Pool>>,
 
-    pub mint_a: InterfaceAccount<'info, Mint>,
-    pub mint_b: InterfaceAccount<'info, Mint>,
+    pub mint_a: Box<InterfaceAccount<'info, Mint>>,
+    pub mint_b: Box<InterfaceAccount<'info, Mint>>,
 
     #[account(
         mut,
         associated_token::mint = mint_a,
         associated_token::authority = pool,
     )]
-    pub pool_a: InterfaceAccount<'info, TokenAccount>,
+    pub pool_a: Box<InterfaceAccount<'info, TokenAccount>>,
 
     #[account(
         mut,
         associated_token::mint = mint_b,
         associated_token::authority = pool,
     )]
-    pub pool_b: InterfaceAccount<'info, TokenAccount>,
+    pub pool_b: Box<InterfaceAccount<'info, TokenAccount>>,
 
     #[account(
         mut,
         associated_token::mint = mint_a,
         associated_token::authority = payer,
     )]
-    pub payer_a: InterfaceAccount<'info, TokenAccount>,
+    pub payer_a: Box<InterfaceAccount<'info, TokenAccount>>,
 
     #[account(
         mut,
         associated_token::mint = mint_b,
         associated_token::authority = payer,
     )]
-    pub payer_b: InterfaceAccount<'info, TokenAccount>,
+    pub payer_b: Box<InterfaceAccount<'info, TokenAccount>>,
 
     pub token_program: Interface<'info, TokenInterface>,
     pub associated_token_program: Program<'info, AssociatedToken>,
@@ -73,10 +73,42 @@ pub fn swap(
 ) -> Result<()> {
     // Calculate amount out with fee
     // amount_out = amount_in * (1 - fee)
+    let mut amount_out = amount_in;
+    let amount_out_fee = amount_out
+        .checked_mul(fee as u64)
+        .unwrap()
+        .checked_div(constants::MAX_POOL_FEE as u64)
+        .unwrap();
+    amount_out = amount_out.checked_sub(amount_out_fee).unwrap();
 
     // Check amount_out >= min_amount_out
+    require!(amount_out >= min_amount_out, error::Error::MinAmountOut);
 
     // Transfer token in from user to pool
+    let (pool_in, pool_out, payer_in, payer_out) = if a_for_b {
+        (
+            &ctx.accounts.pool_a,
+            &ctx.accounts.pool_b,
+            &ctx.accounts.payer_a,
+            &ctx.accounts.payer_b,
+        )
+    } else {
+        (
+            &ctx.accounts.pool_b,
+            &ctx.accounts.pool_a,
+            &ctx.accounts.payer_b,
+            &ctx.accounts.payer_a,
+        )
+    };
+
+    // Transfer token in from user to pool
+    lib::transfer(
+        &ctx.accounts.token_program,
+        payer_in,
+        pool_in,
+        &ctx.accounts.payer,
+        amount_in,
+    )?;
 
     // Transfer token out from pool to user
     let pool_bump = ctx.bumps.pool;
@@ -88,5 +120,13 @@ pub fn swap(
         &[pool_bump],
     ];
 
+    lib::transfer_from_pool(
+        &ctx.accounts.token_program,
+        pool_out,
+        payer_out,
+        &ctx.accounts.pool,
+        amount_out,
+        seeds,
+    )?;
     Ok(())
 }

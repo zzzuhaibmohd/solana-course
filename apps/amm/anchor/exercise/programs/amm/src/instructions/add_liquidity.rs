@@ -6,6 +6,7 @@ use anchor_spl::{
 
 use super::lib;
 use crate::constants;
+use crate::error;
 use crate::state::Pool;
 
 #[derive(Accounts)]
@@ -25,24 +26,24 @@ pub struct AddLiquidity<'info> {
         has_one = mint_a,
         has_one = mint_b,
     )]
-    pub pool: Account<'info, Pool>,
+    pub pool: Box<Account<'info, Pool>>,
 
-    pub mint_a: InterfaceAccount<'info, Mint>,
-    pub mint_b: InterfaceAccount<'info, Mint>,
+    pub mint_a: Box<InterfaceAccount<'info, Mint>>,
+    pub mint_b: Box<InterfaceAccount<'info, Mint>>,
 
     #[account(
         mut,
         associated_token::mint = mint_a,
         associated_token::authority = pool,
     )]
-    pub pool_a: InterfaceAccount<'info, TokenAccount>,
+    pub pool_a: Box<InterfaceAccount<'info, TokenAccount>>,
 
     #[account(
         mut,
         associated_token::mint = mint_b,
         associated_token::authority = pool,
     )]
-    pub pool_b: InterfaceAccount<'info, TokenAccount>,
+    pub pool_b: Box<InterfaceAccount<'info, TokenAccount>>,
 
     #[account(
         mut,
@@ -54,21 +55,21 @@ pub struct AddLiquidity<'info> {
         ],
         bump,
     )]
-    pub mint_pool: InterfaceAccount<'info, Mint>,
+    pub mint_pool: Box<InterfaceAccount<'info, Mint>>,
 
     #[account(
         mut,
         associated_token::mint = mint_a,
         associated_token::authority = payer,
     )]
-    pub payer_a: InterfaceAccount<'info, TokenAccount>,
+    pub payer_a: Box<InterfaceAccount<'info, TokenAccount>>,
 
     #[account(
         mut,
         associated_token::mint = mint_b,
         associated_token::authority = payer,
     )]
-    pub payer_b: InterfaceAccount<'info, TokenAccount>,
+    pub payer_b: Box<InterfaceAccount<'info, TokenAccount>>,
 
     #[account(
         init_if_needed,
@@ -76,7 +77,7 @@ pub struct AddLiquidity<'info> {
         associated_token::mint = mint_pool,
         associated_token::authority = payer,
     )]
-    pub payer_liquidity: InterfaceAccount<'info, TokenAccount>,
+    pub payer_liquidity: Box<InterfaceAccount<'info, TokenAccount>>,
 
     pub token_program: Interface<'info, TokenInterface>,
     pub associated_token_program: Program<'info, AssociatedToken>,
@@ -94,12 +95,66 @@ pub fn add_liquidity(
     user shares = user_liquidity / pool_liquidity * supply
     user_liquidity = amount_a + amount_b
     */
+    require!(amount_a > 0, error::Error::InvalidAmount);
+    require!(amount_b > 0, error::Error::InvalidAmount);
+
+    let user_liquidity = amount_a.checked_add(amount_b).unwrap();
+    let pool_liquidity = ctx
+        .accounts
+        .pool_a
+        .amount
+        .checked_add(ctx.accounts.pool_b.amount)
+        .unwrap();
+    let supply = ctx.accounts.mint_pool.supply;
+    let shares = if pool_liquidity > 0 {
+        user_liquidity.checked_mul(supply).unwrap() / pool_liquidity
+    } else {
+        user_liquidity
+    };
 
     // Transfer amount_a from user into pool_a
+    if amount_a > 0 {
+        lib::transfer(
+            &ctx.accounts.token_program,
+            &ctx.accounts.payer_a,
+            &ctx.accounts.pool_a,
+            &ctx.accounts.payer,
+            amount_a,
+        )?;
+    }
 
     // Transfer amount_b from user into pool_b
+    if amount_b > 0 {
+        lib::transfer(
+            &ctx.accounts.token_program,
+            &ctx.accounts.payer_b,
+            &ctx.accounts.pool_b,
+            &ctx.accounts.payer,
+            amount_b,
+        )?;
+    }
 
     // Mint shares to user's associated token account (payer_liquidity)
-
+    if shares > 0 {
+        let pool_bump = ctx.bumps.pool;
+        let mint_a_bytes = ctx.accounts.mint_a.key().to_bytes();
+        let mint_b_bytes = ctx.accounts.mint_b.key().to_bytes();
+        let fee_bytes = fee.to_le_bytes();
+        let seeds = &[
+            constants::POOL_AUTH_SEED_PREFIX,
+            &mint_a_bytes,
+            &mint_b_bytes,
+            &fee_bytes,
+            &[pool_bump],
+        ];
+        lib::mint(
+            &ctx.accounts.token_program,
+            &ctx.accounts.mint_pool,
+            &ctx.accounts.payer_liquidity,
+            &ctx.accounts.pool,
+            shares,
+            seeds,
+        )?;
+    }
     Ok(())
 }

@@ -6,6 +6,8 @@ pub enum Error {
     InvalidFee,
     #[msg("Decimals mismatch")]
     DecimalsMismatch,
+    #[msg("Invalid amount")]
+    InvalidAmount,
     #[msg("Amount out < min")]
     MinAmountOut,
 }

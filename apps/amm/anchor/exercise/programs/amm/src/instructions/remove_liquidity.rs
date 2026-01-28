@@ -26,24 +26,24 @@ pub struct RemoveLiquidity<'info> {
         has_one = mint_a,
         has_one = mint_b,
     )]
-    pub pool: Account<'info, Pool>,
+    pub pool: Box<Account<'info, Pool>>,
 
-    pub mint_a: InterfaceAccount<'info, Mint>,
-    pub mint_b: InterfaceAccount<'info, Mint>,
+    pub mint_a: Box<InterfaceAccount<'info, Mint>>,
+    pub mint_b: Box<InterfaceAccount<'info, Mint>>,
 
     #[account(
         mut,
         associated_token::mint = mint_a,
         associated_token::authority = pool,
     )]
-    pub pool_a: InterfaceAccount<'info, TokenAccount>,
+    pub pool_a: Box<InterfaceAccount<'info, TokenAccount>>,
 
     #[account(
         mut,
         associated_token::mint = mint_b,
         associated_token::authority = pool,
     )]
-    pub pool_b: InterfaceAccount<'info, TokenAccount>,
+    pub pool_b: Box<InterfaceAccount<'info, TokenAccount>>,
 
     #[account(
         mut,
@@ -55,28 +55,28 @@ pub struct RemoveLiquidity<'info> {
         ],
         bump,
     )]
-    pub mint_pool: InterfaceAccount<'info, Mint>,
+    pub mint_pool: Box<InterfaceAccount<'info, Mint>>,
 
     #[account(
         mut,
         associated_token::mint = mint_a,
         associated_token::authority = payer,
     )]
-    pub payer_a: InterfaceAccount<'info, TokenAccount>,
+    pub payer_a: Box<InterfaceAccount<'info, TokenAccount>>,
 
     #[account(
         mut,
         associated_token::mint = mint_b,
         associated_token::authority = payer,
     )]
-    pub payer_b: InterfaceAccount<'info, TokenAccount>,
+    pub payer_b: Box<InterfaceAccount<'info, TokenAccount>>,
 
     #[account(
         mut,
         associated_token::mint = mint_pool,
         associated_token::authority = payer,
     )]
-    pub payer_liquidity: InterfaceAccount<'info, TokenAccount>,
+    pub payer_liquidity: Box<InterfaceAccount<'info, TokenAccount>>,
 
     pub token_program: Interface<'info, TokenInterface>,
     pub associated_token_program: Program<'info, AssociatedToken>,
@@ -98,25 +98,79 @@ pub fn remove_liquidity(
     amount_b = shares / supply * pool_b_amount
     */
 
-    // Check amount_a >= min_amount_a
-    // Check amount_b >= min_amount_b
+    require!(shares > 0, error::Error::InvalidAmount);
+
+    let supply = ctx.accounts.mint_pool.supply;
+    require!(supply > 0, error::Error::InvalidAmount);
+
+    let pool_a_amount = ctx.accounts.pool_a.amount;
+    let pool_b_amount = ctx.accounts.pool_b.amount;
+
+    // amount_{a,b} = shares / supply * pool_{a,b}_amount
+    // Use integer math (floors). This matches typical LP share accounting.
+    let amount_a = (shares as u128)
+        .checked_mul(pool_a_amount as u128)
+        .unwrap()
+        .checked_div(supply as u128)
+        .unwrap() as u64;
+    let amount_b = (shares as u128)
+        .checked_mul(pool_b_amount as u128)
+        .unwrap()
+        .checked_div(supply as u128)
+        .unwrap() as u64;
+
+    // Slippage protection (min amounts out)
+    require!(amount_a >= min_amount_a, error::Error::MinAmountOut);
+    require!(amount_b >= min_amount_b, error::Error::MinAmountOut);
 
     // NOTE: No withdraw fee
     // payer can call add_liquidity + remove_liquidity to swap tokens without paying swap fee
 
     // Burn user's shares
+    if shares > 0 {
+        lib::burn(
+            &ctx.accounts.token_program,
+            &ctx.accounts.mint_pool,
+            &ctx.accounts.payer_liquidity,
+            &ctx.accounts.payer,
+            shares,
+        )?;
+    }
 
     // Transfer amount_a from pool to payer_a (user's associated token account for token a)
     let pool_bump = ctx.bumps.pool;
+    let mint_a_key = ctx.accounts.mint_a.key();
+    let mint_b_key = ctx.accounts.mint_b.key();
+    let fee_bytes = fee.to_le_bytes();
     let seeds = &[
         constants::POOL_AUTH_SEED_PREFIX,
-        &ctx.accounts.mint_a.key().to_bytes(),
-        &ctx.accounts.mint_b.key().to_bytes(),
-        &fee.to_le_bytes(),
+        &mint_a_key.to_bytes(),
+        &mint_b_key.to_bytes(),
+        &fee_bytes,
         &[pool_bump],
     ];
 
-    // Transfer amount_b from pool to payer_b (user's associated token account for token b)
+    if amount_a > 0 {
+        lib::transfer_from_pool(
+            &ctx.accounts.token_program,
+            &ctx.accounts.pool_a,
+            &ctx.accounts.payer_a,
+            &ctx.accounts.pool,
+            amount_a,
+            seeds,
+        )?;
+    }
 
+    // Transfer amount_b from pool to payer_b (user's associated token account for token b)
+    if amount_b > 0 {
+        lib::transfer_from_pool(
+            &ctx.accounts.token_program,
+            &ctx.accounts.pool_b,
+            &ctx.accounts.payer_b,
+            &ctx.accounts.pool,
+            amount_b,
+            seeds,
+        )?;
+    }
     Ok(())
 }
