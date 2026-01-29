@@ -7,7 +7,7 @@ use solana_sdk::{
     transaction::Transaction,
 };
 
-use oracle::{state::Oracle, Cmd};
+use oracle::{Cmd, state::Oracle};
 
 #[test]
 fn test() {
